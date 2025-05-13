@@ -190,9 +190,6 @@ class BarChartPainter extends AxisChartPainter<BarChartData> {
 
         final x = groupBarsPosition[i].barsX[j];
 
-        double bottom = 0;
-        double top = 0;
-
         final left = x - widthHalf;
         final right = x + widthHalf;
         final cornerHeight =
@@ -206,12 +203,12 @@ class BarChartPainter extends AxisChartPainter<BarChartData> {
             barRod.backDrawRodData.toY != barRod.backDrawRodData.fromY) {
           if (barRod.backDrawRodData.toY > barRod.backDrawRodData.fromY) {
             // positive
-            bottom = getPixelY(
+            final bottom = getPixelY(
               max(data.minY, barRod.backDrawRodData.fromY),
               viewSize,
               holder,
             );
-            top = min(
+            final top = min(
               getPixelY(barRod.backDrawRodData.toY, viewSize, holder),
               bottom - cornerHeight,
             );
@@ -228,12 +225,12 @@ class BarChartPainter extends AxisChartPainter<BarChartData> {
             );
           } else {
             // negative
-            top = getPixelY(
+            final top = getPixelY(
               min(data.maxY, barRod.backDrawRodData.fromY),
               viewSize,
               holder,
             );
-            bottom = max(
+            final bottom = max(
               getPixelY(barRod.backDrawRodData.toY, viewSize, holder),
               top + cornerHeight,
             );
@@ -263,8 +260,9 @@ class BarChartPainter extends AxisChartPainter<BarChartData> {
         if (barRod.toY != barRod.fromY) {
           if (barRod.toY > barRod.fromY) {
             // positive
-            bottom = getPixelY(max(data.minY, barRod.fromY), viewSize, holder);
-            top = min(
+            final bottom =
+                getPixelY(max(data.minY, barRod.fromY), viewSize, holder);
+            final top = min(
               getPixelY(barRod.toY, viewSize, holder),
               bottom - cornerHeight,
             );
@@ -281,8 +279,9 @@ class BarChartPainter extends AxisChartPainter<BarChartData> {
             );
           } else {
             // negative
-            top = getPixelY(min(data.maxY, barRod.fromY), viewSize, holder);
-            bottom = max(
+            final top =
+                getPixelY(min(data.maxY, barRod.fromY), viewSize, holder);
+            final bottom = max(
               getPixelY(barRod.toY, viewSize, holder),
               top + cornerHeight,
             );
@@ -331,14 +330,6 @@ class BarChartPainter extends AxisChartPainter<BarChartData> {
                   stackItem.colors,
                   stackItem.colorStops,
                 );
-                // double center = (left + right) / 2;
-
-                // _barPaint.shader = ui.Gradient.linear(
-                //   Offset(center, min(stackFromY, stackFromY)),
-                //   Offset(center, max(stackToY, stackFromY)),
-                //   stackItem.colors,
-                //   stackItem.colorStops,
-                // );
               }
               final rect = isNegative
                   ? Rect.fromLTRB(left, stackFromY, right, stackToY)
