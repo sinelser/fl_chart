@@ -1,6 +1,7 @@
 import 'dart:core';
 import 'dart:math';
 
+import 'dart:ui' as ui;
 import 'package:fl_chart/fl_chart.dart';
 import 'package:fl_chart/src/chart/base/axis_chart/axis_chart_painter.dart';
 import 'package:fl_chart/src/chart/base/base_chart/base_chart_painter.dart';
@@ -189,6 +190,9 @@ class BarChartPainter extends AxisChartPainter<BarChartData> {
 
         final x = groupBarsPosition[i].barsX[j];
 
+        double bottom = 0;
+        double top = 0;
+
         final left = x - widthHalf;
         final right = x + widthHalf;
         final cornerHeight =
@@ -202,12 +206,12 @@ class BarChartPainter extends AxisChartPainter<BarChartData> {
             barRod.backDrawRodData.toY != barRod.backDrawRodData.fromY) {
           if (barRod.backDrawRodData.toY > barRod.backDrawRodData.fromY) {
             // positive
-            final bottom = getPixelY(
+            bottom = getPixelY(
               max(data.minY, barRod.backDrawRodData.fromY),
               viewSize,
               holder,
             );
-            final top = min(
+            top = min(
               getPixelY(barRod.backDrawRodData.toY, viewSize, holder),
               bottom - cornerHeight,
             );
@@ -224,12 +228,12 @@ class BarChartPainter extends AxisChartPainter<BarChartData> {
             );
           } else {
             // negative
-            final top = getPixelY(
+            top = getPixelY(
               min(data.maxY, barRod.backDrawRodData.fromY),
               viewSize,
               holder,
             );
-            final bottom = max(
+            bottom = max(
               getPixelY(barRod.backDrawRodData.toY, viewSize, holder),
               top + cornerHeight,
             );
@@ -259,9 +263,8 @@ class BarChartPainter extends AxisChartPainter<BarChartData> {
         if (barRod.toY != barRod.fromY) {
           if (barRod.toY > barRod.fromY) {
             // positive
-            final bottom =
-                getPixelY(max(data.minY, barRod.fromY), viewSize, holder);
-            final top = min(
+            bottom = getPixelY(max(data.minY, barRod.fromY), viewSize, holder);
+            top = min(
               getPixelY(barRod.toY, viewSize, holder),
               bottom - cornerHeight,
             );
@@ -278,9 +281,8 @@ class BarChartPainter extends AxisChartPainter<BarChartData> {
             );
           } else {
             // negative
-            final top =
-                getPixelY(min(data.maxY, barRod.fromY), viewSize, holder);
-            final bottom = max(
+            top = getPixelY(min(data.maxY, barRod.fromY), viewSize, holder);
+            bottom = max(
               getPixelY(barRod.toY, viewSize, holder),
               top + cornerHeight,
             );
@@ -311,7 +313,33 @@ class BarChartPainter extends AxisChartPainter<BarChartData> {
               final stackToY = getPixelY(stackItem.toY, viewSize, holder);
 
               final isNegative = stackItem.toY < stackItem.fromY;
-              _barPaint.color = stackItem.color;
+              if (stackItem.colors.length == 1) {
+                _barPaint.color = stackItem.colors[0];
+                _barPaint.shader = null;
+              } else {
+                final topY = min(stackItem.fromY, stackItem.toY);
+                final bottomY = max(stackItem.fromY, stackItem.toY);
+
+                final stackTop = getPixelY(topY, viewSize, holder);
+                final stackBottom = getPixelY(bottomY, viewSize, holder);
+
+                final centerX = (left + right) / 2;
+
+                _barPaint.shader = ui.Gradient.linear(
+                  Offset(centerX, stackTop),
+                  Offset(centerX, stackBottom),
+                  stackItem.colors,
+                  stackItem.colorStops,
+                );
+                // double center = (left + right) / 2;
+
+                // _barPaint.shader = ui.Gradient.linear(
+                //   Offset(center, min(stackFromY, stackFromY)),
+                //   Offset(center, max(stackToY, stackFromY)),
+                //   stackItem.colors,
+                //   stackItem.colorStops,
+                // );
+              }
               final rect = isNegative
                   ? Rect.fromLTRB(left, stackFromY, right, stackToY)
                   : Rect.fromLTRB(left, stackToY, right, stackFromY);
